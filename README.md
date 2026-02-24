@@ -1,4 +1,4 @@
-#  Telegram Clima Bot
+#  Weather Report Telegram bot
 
 Um script em Python simples e eficiente que envia um relatório completo de previsão do tempo diretamente para o seu Telegram. O bot consome os dados da API **HG Brasil Weather** e formata a mensagem de forma amigável, incluindo a temperatura atual, umidade, velocidade do vento e a previsão para os próximos dias.
 
