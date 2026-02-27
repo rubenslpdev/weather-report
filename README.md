@@ -8,6 +8,8 @@ Um script em Python simples e eficiente que envia um relatório completo de prev
 - **Resumo Atual**: Mostra a temperatura no momento, descrição do clima (nublado, ensolarado, etc.), probabilidade de chuva, ventos e umidade.
 - **Previsão Futura**: Informa a mínima, máxima e condições climáticas para os próximos dias.
 - **Segurança**: Uso da biblioteca `dotenv` para esconder chaves de API e Tokens de bots (nunca exponha suas credenciais!).
+- **Comando Interativo**: Permite solicitar o clima a qualquer momento digitando `/clima` no Telegram, respondendo diretamente no chat onde o comando foi enviado.
+- **Execução Híbrida**: O projeto possui um daemon leve (`listener.py`) para escutar os comandos e um script worker (`weather-report.py`) que pode ser acionado tanto pelo daemon (sob demanda) quanto agendado no sistema (via cron).
 
 ##  Pré-requisitos
 
@@ -43,9 +45,24 @@ CIDADE=Sao Paulo,SP
 
 ##  Como usar
 
-Basta executar o script principal no seu terminal:
+Este projeto é dividido em duas partes, permitindo flexibilidade (sob demanda ou agendado):
+
+### 1. Solicitação Manual pelo Telegram (Opcional)
+
+Para permitir que o bot responda ao comando `/clima` a qualquer momento, deixe o script `listener.py` rodando em segundo plano no seu servidor:
+
 ```bash
-python clima_bot.py
+# Executa o listener em background
+nohup python listener.py &
+```
+O listener aguardará mensagens e, ao receber `/clima`, acionará automaticamente o `weather-report.py` passando o ID do chat solicitante, e o bot responderá com o relatório.
+
+### 2. Execução Direta / Manual
+
+Você também pode testar ou executar o envio para o chat configurado no `.env` executando o worker diretamente:
+
+```bash
+python weather-report.py
 ```
 
 Você deverá ver a mensagem `"✅ Relatório de previsão do tempo enviado com sucesso!"` no terminal e receberá uma mensagem no Telegram parecida com esta:
@@ -64,12 +81,14 @@ Você deverá ver a mensagem `"✅ Relatório de previsão do tempo enviado com 
 > Max 23°c  
 > Chuvas esparsas  
 
-##  Dica: Automação
+##  Dica: Automação (Cron Job)
 
-Para que você receba esse relatório todos os dias automaticamente, você pode agendar a execução deste script:
-- **No Linux/Mac:** Use o `crontab`. Exemplo para rodar todo dia às 07:00 da manhã:
-  `0 7 * * * /caminho/para/o/python /caminho/para/o/clima_bot.py`
-- **No Windows:** Use o "Agendador de Tarefas" (Task Scheduler) para disparar o script diariamente.
+Para que você receba esse relatório todos os dias automaticamente no chat configurado no seu `.env`, você pode agendar a execução do script `weather-report.py`:
+
+- **No Linux/Mac:** Use o `crontab -e`. Exemplo para rodar todo dia às 07:00 da manhã:
+  `0 7 * * * cd /caminho/para/o/projeto && /usr/bin/python3 weather-report.py`
+
+*Nota: Ao ser executado pelo Cron (sem o listener), o script automaticamente assume o `TELEGRAM_CHAT_ID` configurado no seu arquivo `.env`.*
 
 ##  Observação sobre a API (Limitação de dias)
 

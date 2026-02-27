@@ -1,4 +1,5 @@
 import os
+import sys
 import requests
 from datetime import datetime
 from dotenv import load_dotenv
@@ -37,11 +38,12 @@ def buscar_previsao_tempo():
         print(f"Erro ao buscar dados do clima: {e}")
         return None
 
-def enviar_mensagem_telegram(mensagem):
+def enviar_mensagem_telegram(mensagem, chat_id=None):
     """Envia a mensagem formatada para o Telegram"""
+    alvo_chat_id = chat_id or TELEGRAM_CHAT_ID
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     payload = {
-        "chat_id": TELEGRAM_CHAT_ID,
+        "chat_id": alvo_chat_id,
         "text": mensagem,
         "parse_mode": "HTML" # Usar HTML para garantir que o negrito (<b>) funcione sem erros
     }
@@ -54,8 +56,11 @@ def enviar_mensagem_telegram(mensagem):
         print(f"❌ Erro ao enviar mensagem para o Telegram: {e}")
 
 def main():
+    # O chat_id pode vir via argumento (pelo listener) ou do .env (pelo cron)
+    custom_chat_id = sys.argv[1] if len(sys.argv) > 1 else None
+
     # Verifica se todas as chaves estão no .env
-    if not all([TELEGRAM_TOKEN, TELEGRAM_CHAT_ID, HG_API_KEY, CIDADE]):
+    if not all([TELEGRAM_TOKEN, HG_API_KEY, CIDADE]) or (not custom_chat_id and not TELEGRAM_CHAT_ID):
         print("⚠️ Verifique seu arquivo .env. Faltam variáveis de ambiente.")
         return
 
@@ -103,7 +108,7 @@ def main():
     mensagem = mensagem.strip()
     
     # Envia a mensagem
-    enviar_mensagem_telegram(mensagem)
+    enviar_mensagem_telegram(mensagem, custom_chat_id)
 
 if __name__ == "__main__":
     main()
