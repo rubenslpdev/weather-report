@@ -23,8 +23,8 @@ Antes de começar, você precisará de:
 
 **1. Clone ou baixe este repositório**
 ```bash
-git clone https://github.com/seu-usuario/telegram-clima-bot.git
-cd telegram-clima-bot
+git clone https://github.com/rubenslpdev/weather-report.git
+cd weather-report
 ```
 
 **2. Instale as dependências**
