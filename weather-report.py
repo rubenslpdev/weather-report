@@ -69,41 +69,52 @@ def main():
     if not dados_clima:
         return
 
-    # Extração das variáveis atuais
-    temp_atual = dados_clima.get("temp")
-    descricao_atual = dados_clima.get("description")
-    wind_speedy = dados_clima.get("wind_speedy")
-    humidity = dados_clima.get("humidity")
+    # Extração das variáveis atuais com valores padrão
+    temp_atual = dados_clima.get("temp", "--")
+    descricao_atual = dados_clima.get("description", "sem descrição")
+    wind_speedy = dados_clima.get("wind_speedy", "--")
+    humidity = dados_clima.get("humidity", "--")
     
     # A lista 'forecast' contém a previsão diária.
     # O índice [0] é o dia de hoje. Os índices [1], [2] e [3] são os próximos dias.
     previsao = dados_clima.get("forecast", [])
     hoje = previsao[0]
     
-    hoje_min = hoje.get("min")
-    hoje_max = hoje.get("max")
-    rain_probability = hoje.get("rain_probability")
+    hoje_min = hoje.get("min", "--")
+    hoje_max = hoje.get("max", "--")
+    rain_probability = hoje.get("rain_probability", "--")
     
     # Montagem da mensagem usando formatação HTML para o Telegram
     saudacao = get_saudacao()
+    cidade_api = dados_clima.get("city_name")
     
-    mensagem = f"<b>{saudacao}</b>\n"
-    mensagem += f"A temperatura agora é de {temp_atual}°c e {descricao_atual}.\n"
-    mensagem += f"Está prevista mínima de {hoje_min}°c e máxima de {hoje_max}°c para hoje.\n"
-    mensagem += f"☂️ {rain_probability}%\n"
-    mensagem += f"💨 {wind_speedy}\n"
-    mensagem += f"💧 {humidity}%\n\n"
-    mensagem += "Previsão para os amanhã:\n\n"
-    
+    mensagem = f"<b>{saudacao}!</b>\n\n"
+    mensagem += f"Veja o clima agora em <b>{cidade_api}</b>:\n"
+    mensagem += f"🌡️ <b>{temp_atual}°C</b> — {descricao_atual}\n"
+    mensagem += f"💧 Umidade: {humidity}%\n"
+    mensagem += f"💨 Vento: {wind_speedy}\n\n"
+
+    mensagem += f"<b>Previsão para hoje:</b>\n"
+    mensagem += f"� Máxima: {hoje_max}°C\n"
+    mensagem += f"� Mínima: {hoje_min}°C\n"
+    mensagem += f"☂️ Chuva: {rain_probability}%\n\n"
+
     # Pega os próximos 3 dias de previsão (índices 1 a 3)
     proximos_dias = previsao[1:4]
     
-    for dia in proximos_dias:
-        mensagem += f"<b>{dia.get('date')}</b>\n"
-        mensagem += f"Min {dia.get('min')}°c\n"
-        mensagem += f"Max {dia.get('max')}°c\n"
-        mensagem += f"{dia.get('description')}\n\n"
+    if proximos_dias:
+        mensagem += "───────────────────\n"
+        mensagem += "📅 <b>Próximos dias:</b>\n\n"
         
+        for dia in proximos_dias:
+            data = dia.get('date')
+            weekday = dia.get('weekday')
+            mensagem += f"<b>{data} ({weekday})</b>\n"
+            mensagem += f"🌡️ {dia.get('min')}°C a {dia.get('max')}°C\n"
+            mensagem += f"☁️ {dia.get('description')}\n\n"
+        
+    mensagem += "✨ <i>Tenha um excelente dia!</i>"
+    
     # Remove espaços ou quebras de linha em excesso no final
     mensagem = mensagem.strip()
     
