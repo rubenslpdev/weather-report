@@ -88,28 +88,28 @@ def main():
     saudacao = get_saudacao()
     cidade_api = dados_clima.get("city_name")
     
-    mensagem = f"<b>{saudacao}!</b>\n\n"
+    mensagem = f"<b>{saudacao}</b>\n\n"
     mensagem += f"Veja o clima agora em <b>{cidade_api}</b>:\n"
     mensagem += f"🌡️ <b>{temp_atual}°C</b> — {descricao_atual}\n"
     mensagem += f"💧 Umidade: {humidity}%\n"
     mensagem += f"💨 Vento: {wind_speedy}\n\n"
 
     mensagem += f"<b>Previsão para hoje:</b>\n"
-    mensagem += f"� Máxima: {hoje_max}°C\n"
-    mensagem += f"� Mínima: {hoje_min}°C\n"
+    mensagem += f"🌞 Máxima: {hoje_max}°C\n"
+    mensagem += f"☃️ Mínima: {hoje_min}°C\n"
     mensagem += f"☂️ Chuva: {rain_probability}%\n\n"
 
     # Pega os próximos 3 dias de previsão (índices 1 a 3)
     proximos_dias = previsao[1:4]
     
     if proximos_dias:
-        mensagem += "───────────────────\n"
-        mensagem += "📅 <b>Próximos dias:</b>\n\n"
+        mensagem += "───────────────────\n\n"
+        mensagem += "<b>Próximos dias:</b>\n\n"
         
         for dia in proximos_dias:
             data = dia.get('date')
             weekday = dia.get('weekday')
-            mensagem += f"<b>{data} ({weekday})</b>\n"
+            mensagem += f"📅 <b>{data} ({weekday})</b>\n"
             mensagem += f"🌡️ {dia.get('min')}°C a {dia.get('max')}°C\n"
             mensagem += f"☁️ {dia.get('description')}\n\n"
         
